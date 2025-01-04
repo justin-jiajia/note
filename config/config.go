@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+
 	"gopkg.in/ini.v1"
 )
 
@@ -18,7 +19,7 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-	cfg, err := ini.Load("config/config.ini")
+	cfg, err := ini.Load("config.ini")
 	if err != nil {
 		log.Fatal("Failed to load config file: ", err)
 	}

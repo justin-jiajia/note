@@ -1,0 +1,209 @@
+definitions:
+  handler.CreateNoteRequest:
+    description: Request model for creating a new note
+    properties:
+      body:
+        description: Content of the note
+        type: string
+      encryptionTag:
+        description: Tag used for encryption verification
+        type: string
+      isEncrypted:
+        description: Whether the note should be encrypted
+        type: boolean
+      title:
+        description: Title of the note
+        type: string
+    required:
+    - title
+    type: object
+  handler.EditNoteRequest:
+    description: Request model for updating an existing note
+    properties:
+      body:
+        description: Content of the note
+        type: string
+      title:
+        description: Title of the note
+        type: string
+    type: object
+  handler.ErrorResponse:
+    description: Error response model
+    properties:
+      error:
+        description: Error message
+        type: string
+    type: object
+  handler.NoteResponse:
+    description: Response model for note data
+    properties:
+      body:
+        description: Content of the note
+        type: string
+      createdAt:
+        description: Unix timestamp of note creation
+        type: integer
+      encryptionTag:
+        description: Tag used for encryption verification (only included if note is
+          encrypted)
+        type: string
+      id:
+        description: Unique identifier for the note
+        type: integer
+      isEncrypted:
+        description: Whether the note is encrypted
+        type: boolean
+      slug:
+        description: URL-friendly identifier for the note
+        type: string
+      title:
+        description: Title of the note
+        type: string
+      updatedAt:
+        description: Unix timestamp of last note update
+        type: integer
+    type: object
+  handler.SuccessResponse:
+    description: Success response model
+    properties:
+      message:
+        description: Success message
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /notes:
+    post:
+      consumes:
+      - application/json
+      description: Create a new note with title, body, and optional encryption
+      parameters:
+      - description: Note creation data
+        in: body
+        name: note
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.NoteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Create a note
+      tags:
+      - notes
+  /notes/{slug}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a note by its slug
+      parameters:
+      - description: Note slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Delete a note
+      tags:
+      - notes
+    get:
+      consumes:
+      - application/json
+      description: Get a note by its slug
+      parameters:
+      - description: Note slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.NoteResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: View a note
+      tags:
+      - notes
+    put:
+      consumes:
+      - application/json
+      description: Update a note's title and body by its slug
+      parameters:
+      - description: Note slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Note update data
+        in: body
+        name: note
+        required: true
+        schema:
+          $ref: '#/definitions/handler.EditNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.NoteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Update a note
+      tags:
+      - notes
+swagger: "2.0"

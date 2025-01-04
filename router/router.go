@@ -1,17 +1,14 @@
 package router
 
 import (
-	"embed"
-	"io/fs"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/justin-jiajia/note/docs"
+	_ "github.com/justin-jiajia/note/docs"
 	"github.com/justin-jiajia/note/handler"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
-
-//go:embed front/build
-var staticFiles embed.FS
 
 type Router struct {
 	db *gorm.DB
@@ -35,21 +32,15 @@ func (r *Router) InitRouter() *gin.Engine {
 		api.GET("/notes/:slug", handler.ViewNote(r.db))
 		api.PUT("/notes/:slug", handler.EditNote(r.db))
 		api.DELETE("/notes/:slug", handler.DeleteNote(r.db))
+		api.POST("/notes", handler.CreateNote(r.db))
 	}
 
-	// Serve frontend in production
-	if gin.Mode() == gin.ReleaseMode {
-			// Get the embedded frontend files
-		frontend, err := fs.Sub(staticFiles, "front/build")
-		if err != nil {
-			panic(err)
-		}
-		
-		// Serve the entire frontend for root and handle HTML5 history mode
-		router.NoRoute(func(c *gin.Context) {
-			c.FileFromFS(c.Request.URL.Path, http.FS(frontend))
-		})
-	}
+	docs.SwaggerInfo.BasePath="/api/v1"
+	docs.SwaggerInfo.Title="Note API"
+	docs.SwaggerInfo.Version="1.0"
+	docs.SwaggerInfo.Description="A simple note-taking API"
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

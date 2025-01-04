@@ -5,10 +5,10 @@ import (
 	"github.com/justin-jiajia/note/config"
 	"github.com/justin-jiajia/note/database"
 	"github.com/justin-jiajia/note/router"
-	"os"
 )
 
 func main() {
+
 	// Initialize configuration
 	cfg := config.NewConfig()
 
