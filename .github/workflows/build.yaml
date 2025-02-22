@@ -23,6 +23,9 @@ jobs:
             GOARCH: amd64
     runs-on: ${{ matrix.platform }}
 
+    permissions:
+      contents: write
+      
     steps:
 
     - name: Set up Go 1.x
