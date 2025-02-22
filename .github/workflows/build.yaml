@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: 'Build, package and release to GitHub'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-latest
+            GOOS: linux
+            GOARCH: amd64
+          - platform: ubuntu-latest
+            GOOS: linux
+            GOARCH: arm64
+          - platform: windows-latest
+            GOOS: windows
+            GOARCH: amd64
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v5
+      with:
+        go-version: ^1.24
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
+
+    - name: Install Frontend dependencies
+      working-directory: front
+      run: yarn install
+
+    - name: Build Frontend
+      working-directory: front
+      run: yarn build
+
+    - name: Build Go
+      shell: bash
+      run: |
+        GOOS=${{ matrix.GOOS }} GOARCH=${{ matrix.GOARCH }} CGO_ENABLED=0 \
+            go build -v -ldflags '-w -s' ../
+
+    - name: Rename (Windows PowerShell)
+      if: "${{ matrix.GOOS == 'windows' }}"
+      run: |
+        Rename-Item .\note.exe note_${{ matrix.GOOS }}_${{ matrix.GOARCH }}
+
+    - name: Rename (Linux)
+      if: "${{ matrix.GOOS != 'windows' }}"
+      run: |
+        mv note note_${{ matrix.GOOS }}_${{ matrix.GOARCH }}
+
+    - name: Upload built executable to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        fail_on_unmatched_files: false
+        files: |
+          note_*

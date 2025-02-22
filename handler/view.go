@@ -9,6 +9,7 @@ import (
 )
 
 // ViewNote handles requests to view a single note by its slug
+//
 //	@Summary		View a note
 //	@Description	Get a note by its slug
 //	@Tags			notes
@@ -25,7 +26,7 @@ func ViewNote(db *gorm.DB) gin.HandlerFunc {
 
 		var note model.Note
 		result := db.Where("slug = ?", slug).First(&note)
-		
+
 		if result.Error == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, ErrorResponse{Error: "Note not found"})
 			return
@@ -36,13 +37,15 @@ func ViewNote(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, NoteResponse{
-			ID:          note.ID,
-			Slug:        note.Slug,
-			Title:       note.Title,
-			Body:        note.Body,
-			IsEncrypted: note.IsEncrypted,
-			CreatedAt:   note.CreatedAt.Unix(),
-			UpdatedAt:   note.UpdatedAt.Unix(),
+			ID:             note.ID,
+			Slug:           note.Slug,
+			Title:          note.Title,
+			Body:           note.Body,
+			IsEncrypted:    note.IsEncrypted,
+			CreatedAt:      note.CreatedAt.Unix(),
+			UpdatedAt:      note.UpdatedAt.Unix(),
+			EncryptionSalt: note.EncryptionSalt,
+			EncryptionTag:  note.EncryptionTag,
 		})
 	}
 }

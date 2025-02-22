@@ -9,6 +9,7 @@ import (
 )
 
 // DeleteNote handles requests to delete an existing note
+//
 //	@Summary		Delete a note
 //	@Description	Delete a note by its slug
 //	@Tags			notes
@@ -31,7 +32,7 @@ func DeleteNote(db *gorm.DB) gin.HandlerFunc {
 		// Verify encryption tag for encrypted notes
 		if note.IsEncrypted {
 			providedTag := c.GetHeader("X-Encryption-Tag")
-			if providedTag != note.EncryptionTag {
+			if providedTag != note.EncryptionVerificationTag {
 				c.JSON(http.StatusForbidden, ErrorResponse{Error: "Invalid encryption tag"})
 				return
 			}

@@ -9,6 +9,7 @@ import (
 )
 
 // EditNote handles requests to update an existing note
+//
 //	@Summary		Update a note
 //	@Description	Update a note's title and body by its slug
 //	@Tags			notes
@@ -33,16 +34,13 @@ func EditNote(db *gorm.DB) gin.HandlerFunc {
 		// Verify encryption tag for encrypted notes
 		if note.IsEncrypted {
 			providedTag := c.GetHeader("X-Encryption-Tag")
-			if providedTag != note.EncryptionTag {
+			if providedTag != note.EncryptionVerificationTag {
 				c.JSON(http.StatusForbidden, ErrorResponse{Error: "Invalid encryption tag"})
 				return
 			}
 		}
 
-		var input struct {
-			Title string `json:"title"`
-			Body  string `json:"body"`
-		}
+		var input EditNoteRequest
 		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid input"})
 			return

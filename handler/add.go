@@ -10,6 +10,7 @@ import (
 )
 
 // generateSlug creates a random 4-character slug using a-z
+//
 //	@Summary		Generate unique slug
 //	@Description	Creates a random 4-character string for use as a note slug
 //	@Return			string Random 4-character slug
@@ -23,6 +24,7 @@ func generateSlug() string {
 }
 
 // CreateNote handles requests to create a new note
+//
 //	@Summary		Create a note
 //	@Description	Create a new note with title, body, and optional encryption
 //	@Tags			notes
@@ -35,13 +37,7 @@ func generateSlug() string {
 //	@Router			/notes [post]
 func CreateNote(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var input struct {
-			Title         string `json:"title" binding:"required"`
-			Body          string `json:"body"`
-			IsEncrypted   bool   `json:"isEncrypted"`
-			EncryptionTag string `json:"encryptionTag"`
-		}
-
+		var input CreateNoteRequest
 		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid input"})
 			return
@@ -67,11 +63,13 @@ func CreateNote(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		note := model.Note{
-			Title:         input.Title,
-			Body:          input.Body,
-			Slug:          slug,
-			IsEncrypted:   input.IsEncrypted,
-			EncryptionTag: input.EncryptionTag,
+			Title:                     input.Title,
+			Body:                      input.Body,
+			Slug:                      slug,
+			IsEncrypted:               input.IsEncrypted,
+			EncryptionTag:             input.EncryptionTag,
+			EncryptionVerificationTag: input.EncryptionVerificationTag,
+			EncryptionSalt:            input.EncryptionSalt,
 		}
 
 		if err := db.Create(&note).Error; err != nil {
@@ -80,13 +78,15 @@ func CreateNote(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusCreated, NoteResponse{
-			ID:          note.ID,
-			Slug:        note.Slug,
-			Title:       note.Title,
-			Body:        note.Body,
-			IsEncrypted: note.IsEncrypted,
-			CreatedAt:   note.CreatedAt.Unix(),
-			UpdatedAt:   note.UpdatedAt.Unix(),
+			ID:             note.ID,
+			Slug:           note.Slug,
+			Title:          note.Title,
+			Body:           note.Body,
+			IsEncrypted:    note.IsEncrypted,
+			CreatedAt:      note.CreatedAt.Unix(),
+			UpdatedAt:      note.UpdatedAt.Unix(),
+			EncryptionSalt: note.EncryptionSalt,
+			EncryptionTag:  note.EncryptionTag,
 		})
 	}
 }

@@ -7,15 +7,17 @@ import (
 )
 
 type Note struct {
-	ID            uint           `gorm:"primarykey"`
-	Slug          string         `gorm:"size:255;uniqueIndex"`
-	Title         string         `gorm:"size:255;not null"`
-	Body          string         `gorm:"type:text"`
-	IsEncrypted   bool          `gorm:"default:false"`
-	EncryptionTag string         `gorm:"size:255"` // For client-side encryption verification
-	CreatedAt     time.Time      `gorm:"not null"`
-	UpdatedAt     time.Time      `gorm:"not null"`
-	DeletedAt     gorm.DeletedAt `gorm:"index"`
+	ID                        uint           `gorm:"primarykey"`
+	Slug                      string         `gorm:"size:255;uniqueIndex"`
+	Title                     string         `gorm:"size:255;not null"`
+	Body                      string         `gorm:"type:text"`
+	IsEncrypted               bool           `gorm:"default:false"`
+	EncryptionSalt            string         `gorm:"size:255"` // For client-side encryption
+	EncryptionTag             string         `gorm:"size:255"` // For client-side encryption verification
+	EncryptionVerificationTag string         `gorm:"size:255"`
+	CreatedAt                 time.Time      `gorm:"not null"`
+	UpdatedAt                 time.Time      `gorm:"not null"`
+	DeletedAt                 gorm.DeletedAt `gorm:"index"`
 }
 
 type NoteHistory struct {

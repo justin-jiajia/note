@@ -229,11 +229,19 @@ const docTemplate = `{
                     "description": "Content of the note",
                     "type": "string"
                 },
-                "encryptionTag": {
+                "encryption_salt": {
+                    "description": "Salt used for client-side encryption",
+                    "type": "string"
+                },
+                "encryption_tag": {
                     "description": "Tag used for encryption verification",
                     "type": "string"
                 },
-                "isEncrypted": {
+                "encryption_verification_tag": {
+                    "description": "Verification tag used for encryption",
+                    "type": "string"
+                },
+                "is_encrypted": {
                     "description": "Whether the note should be encrypted",
                     "type": "boolean"
                 },
@@ -275,11 +283,15 @@ const docTemplate = `{
                     "description": "Content of the note",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "Unix timestamp of note creation",
                     "type": "integer"
                 },
-                "encryptionTag": {
+                "encryption_salt": {
+                    "description": "Salt used for client-side encryption (only included if note is encrypted)",
+                    "type": "string"
+                },
+                "encryption_tag": {
                     "description": "Tag used for encryption verification (only included if note is encrypted)",
                     "type": "string"
                 },
@@ -287,7 +299,7 @@ const docTemplate = `{
                     "description": "Unique identifier for the note",
                     "type": "integer"
                 },
-                "isEncrypted": {
+                "is_encrypted": {
                     "description": "Whether the note is encrypted",
                     "type": "boolean"
                 },
@@ -299,7 +311,7 @@ const docTemplate = `{
                     "description": "Title of the note",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "Unix timestamp of last note update",
                     "type": "integer"
                 }
