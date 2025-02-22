@@ -49,7 +49,7 @@ jobs:
       shell: bash
       run: |
         GOOS=${{ matrix.GOOS }} GOARCH=${{ matrix.GOARCH }} CGO_ENABLED=0 \
-            go build -v -ldflags '-w -s' ../
+            go build -v -ldflags '-w -s' .
 
     - name: Rename (Windows PowerShell)
       if: "${{ matrix.GOOS == 'windows' }}"
