@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { encrypt, decrypt } from './crypto';
+import { format_date } from './date';
 
 export const cur_note = ref({
   title: '',
@@ -19,6 +20,11 @@ export const fetch_note = async (slug, force) => {
   }
   const res = await fetch(import.meta.env.VITE_API_BASE + 'api/v1/notes/' + slug);
   const resjson = await res.json();
+  for (let cur_history in resjson.histories) {
+    console.log(cur_history)
+    console.log(resjson.histories[cur_history])
+    resjson.histories[cur_history].created_at_text = format_date(resjson.histories[cur_history].created_at);
+  }
   if (!res.ok) {
     ElMessage.error(resjson.error);
     return;
@@ -148,10 +154,35 @@ export const create_note = async (note, router) => {
 }
 
 export const decrypt_note = (passwd) => {
+  if (!cur_note.value.is_encrypted)
+    return
   if (passwd)
     cur_note.value.passwd = passwd;
   cur_note.value.decrypted = true;
   cur_note.value.title = decrypt(cur_note.value.title, cur_note.value.passwd, cur_note.value.encryption_salt);
   cur_note.value.body = decrypt(cur_note.value.body, cur_note.value.passwd, cur_note.value.encryption_salt);
   cur_note.value.encryption_verification_tag = encrypt('verification', cur_note.value.passwd, cur_note.value.encryption_salt);
+  for (let cur_history in cur_note.value.histories) {
+    cur_note.value.histories[cur_history].title = decrypt(cur_note.value.histories[cur_history].title, cur_note.value.passwd, cur_note.value.encryption_salt);
+    cur_note.value.histories[cur_history].body = decrypt(cur_note.value.histories[cur_history].body, cur_note.value.passwd, cur_note.value.encryption_salt);
+  }
+}
+
+export const copy_source = () => {
+  navigator.clipboard.writeText(cur_note.value.body).then(() => {
+    ElMessage.success('Copied to clipboard')
+  }).catch(() => {
+    ElMessage.error('Failed to copy to clipboard')
+  })
+}
+
+export const download_source = () => {
+  //export a "title.md" file
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(cur_note.value.body));
+  element.setAttribute('download', cur_note.value.title + '.md');
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
 }

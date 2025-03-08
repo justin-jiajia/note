@@ -38,28 +38,24 @@ func generateSlug() string {
 func CreateNote(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input CreateNoteRequest
-		if err := c.BindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid input"})
+		if err := c.ShouldBindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 			return
 		}
 
-		// Generate unique slug
-		var exists bool
+		// Generate a unique slug for the note
 		slug := generateSlug()
-		for attempts := 0; attempts < 10; attempts++ {
+		for {
+			var exists bool
 			err := db.Model(&model.Note{}).Select("count(*) > 0").Where("slug = ?", slug).Find(&exists).Error
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to check slug"})
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to check slug uniqueness"})
 				return
 			}
 			if !exists {
 				break
 			}
 			slug = generateSlug()
-		}
-		if exists {
-			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to generate unique slug"})
-			return
 		}
 
 		note := model.Note{
@@ -78,12 +74,14 @@ func CreateNote(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusCreated, NoteResponse{
+			SingleNote: SingleNote{
+				Title:     note.Title,
+				Body:      note.Body,
+				CreatedAt: note.CreatedAt.Unix(),
+			},
 			ID:             note.ID,
 			Slug:           note.Slug,
-			Title:          note.Title,
-			Body:           note.Body,
 			IsEncrypted:    note.IsEncrypted,
-			CreatedAt:      note.CreatedAt.Unix(),
 			UpdatedAt:      note.UpdatedAt.Unix(),
 			EncryptionSalt: note.EncryptionSalt,
 			EncryptionTag:  note.EncryptionTag,

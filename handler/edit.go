@@ -55,13 +55,17 @@ func EditNote(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, NoteResponse{
-			ID:          note.ID,
-			Slug:        note.Slug,
-			Title:       note.Title,
-			Body:        note.Body,
-			IsEncrypted: note.IsEncrypted,
-			CreatedAt:   note.CreatedAt.Unix(),
-			UpdatedAt:   note.UpdatedAt.Unix(),
+			SingleNote: SingleNote{
+				Title:     note.Title,
+				Body:      note.Body,
+				CreatedAt: note.CreatedAt.Unix(),
+			},
+			ID:             note.ID,
+			Slug:           note.Slug,
+			IsEncrypted:    note.IsEncrypted,
+			UpdatedAt:      note.UpdatedAt.Unix(),
+			EncryptionSalt: note.EncryptionSalt,
+			EncryptionTag:  note.EncryptionTag,
 		})
 	}
 }

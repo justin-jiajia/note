@@ -73,6 +73,57 @@ definitions:
         description: Unix timestamp of last note update
         type: integer
     type: object
+  handler.NoteWithHistoriesResponse:
+    description: Response model for note data with histories
+    properties:
+      body:
+        description: Content of the note
+        type: string
+      created_at:
+        description: Unix timestamp of note creation
+        type: integer
+      encryption_salt:
+        description: Salt used for client-side encryption (only included if note is
+          encrypted)
+        type: string
+      encryption_tag:
+        description: Tag used for encryption verification (only included if note is
+          encrypted)
+        type: string
+      histories:
+        description: List of note histories
+        items:
+          $ref: '#/definitions/handler.SingleNote'
+        type: array
+      id:
+        description: Unique identifier for the note
+        type: integer
+      is_encrypted:
+        description: Whether the note is encrypted
+        type: boolean
+      slug:
+        description: URL-friendly identifier for the note
+        type: string
+      title:
+        description: Title of the note
+        type: string
+      updated_at:
+        description: Unix timestamp of last note update
+        type: integer
+    type: object
+  handler.SingleNote:
+    description: Response model for note data
+    properties:
+      body:
+        description: Content of the note
+        type: string
+      created_at:
+        description: Unix timestamp of note creation
+        type: integer
+      title:
+        description: Title of the note
+        type: string
+    type: object
   handler.SuccessResponse:
     description: Success response model
     properties:
@@ -162,7 +213,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.NoteResponse'
+            $ref: '#/definitions/handler.NoteWithHistoriesResponse'
         "404":
           description: Not Found
           schema:

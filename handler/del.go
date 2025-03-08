@@ -38,6 +38,12 @@ func DeleteNote(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
+		// Delete all histories associated with the note
+		if err := db.Where("note_id = ?", note.ID).Delete(&model.NoteHistory{}).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to delete note histories"})
+			return
+		}
+
 		if err := db.Delete(&note).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to delete note"})
 			return
