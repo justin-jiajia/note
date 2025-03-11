@@ -3,7 +3,17 @@
     <el-table :data="cur_note.histories" style="width: 100%">
       <el-table-column property="created_at_text" label="Date" />
       <el-table-column property="title" label="Note Name" />
+      <el-table-column label="Operations">
+        <template #default="scope">
+          <el-button @click="preview = scope.row.body; previewVisible = true" >
+            Preview
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
+  </el-dialog>
+  <el-dialog v-model="previewVisible" title="Preview" width="800">
+    <MdPreview :modelValue="preview" />
   </el-dialog>
   <AskPasswdComponent ref="askpasswd" />
   <el-container>
@@ -78,6 +88,8 @@ const id = 'preview-only';
 const scrollElement = document.getElementById("preview-container");
 const route = useRoute();
 const router = useRouter();
+const preview = ref(null);
+const previewVisible = ref(false);
 const askpasswd = ref(null);
 const dialogHistoryVisible = ref(false);
 const refresh_loading = ref(false);

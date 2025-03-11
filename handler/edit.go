@@ -17,7 +17,7 @@ import (
 //	@Produce		json
 //	@Param			slug	path		string			true	"Note slug"
 //	@Param			note	body		EditNoteRequest	true	"Note update data"
-//	@Success		200		{object}	NoteResponse
+//	@Success		200		{object}	NoteWithHistoriesResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		403		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
@@ -54,18 +54,37 @@ func EditNote(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, NoteResponse{
-			SingleNote: SingleNote{
-				Title:     note.Title,
-				Body:      note.Body,
-				CreatedAt: note.CreatedAt.Unix(),
+		var histories []model.NoteHistory
+		if err := db.Where("note_id = ?", note.ID).Find(&histories).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to retrieve note histories"})
+			return
+		}
+
+		// Convert histories to []SingleNote
+		var singleNoteHistories []SingleNote
+		for _, history := range histories {
+			singleNoteHistories = append(singleNoteHistories, SingleNote{
+				Title:     history.Title,
+				Body:      history.Body,
+				CreatedAt: history.CreatedAt.Unix(),
+			})
+		}
+
+		c.JSON(http.StatusOK, NoteWithHistoriesResponse{
+			NoteResponse: NoteResponse{
+				SingleNote: SingleNote{
+					Title:     note.Title,
+					Body:      note.Body,
+					CreatedAt: note.CreatedAt.Unix(),
+				},
+				ID:             note.ID,
+				Slug:           note.Slug,
+				IsEncrypted:    note.IsEncrypted,
+				UpdatedAt:      note.UpdatedAt.Unix(),
+				EncryptionSalt: note.EncryptionSalt,
+				EncryptionTag:  note.EncryptionTag,
 			},
-			ID:             note.ID,
-			Slug:           note.Slug,
-			IsEncrypted:    note.IsEncrypted,
-			UpdatedAt:      note.UpdatedAt.Unix(),
-			EncryptionSalt: note.EncryptionSalt,
-			EncryptionTag:  note.EncryptionTag,
+			Histories:      singleNoteHistories,
 		})
 	}
 }

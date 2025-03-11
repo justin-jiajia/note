@@ -28,6 +28,9 @@ jobs:
       
     steps:
 
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
+
     - name: Set up Go 1.x
       uses: actions/setup-go@v5
       with:
@@ -36,9 +39,6 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 22
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
 
     - name: Install Frontend dependencies
       working-directory: front
