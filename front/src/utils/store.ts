@@ -14,7 +14,7 @@ export const cur_note = ref({
   passwd: '',
 })
 
-export const fetch_note = async (slug, force) => {
+export const fetch_note = async (slug: string, force: boolean) => {
   if (slug == cur_note.value.slug && !force) {
     return
   }
@@ -32,14 +32,14 @@ export const fetch_note = async (slug, force) => {
   cur_note.value = { ...cur_note.value, ...resjson }
 }
 
-export const verfiy_passwd = (passwd) => {
+export const verfiy_passwd = (passwd: string) => {
   if (cur_note.value.encryption_tag != encrypt('tag', passwd, cur_note.value.encryption_salt)) {
     return false
   }
   return true
 };
 
-export async function deletecurrent(router) {
+export async function deletecurrent(router: any) {
   try {
     await ElMessageBox.confirm('This will delete the note, are you sure?', 'Warning', {
       confirmButtonText: 'OK',
@@ -104,7 +104,7 @@ export const sharecurruent = () => {
     })
 }
 
-export const updatecurrent = async (router, edited) => {
+export const updatecurrent = async (router: any, edited: any) => {
   var edited_encrypted = undefined
   if (cur_note.value.is_encrypted) {
     edited_encrypted = {
@@ -134,7 +134,7 @@ export const updatecurrent = async (router, edited) => {
   router.push({ name: 'view', params: { slug: cur_note.value.slug } })
 }
 
-export const create_note = async (note, router) => {
+export const create_note = async (note: any, router: any) => {
   const res = await fetch(import.meta.env.VITE_API_BASE + 'api/v1/notes', {
     method: 'POST',
     headers: {
@@ -153,7 +153,7 @@ export const create_note = async (note, router) => {
   return res;
 }
 
-export const decrypt_note = (passwd) => {
+export const decrypt_note = (passwd?: string) => {
   if (!cur_note.value.is_encrypted)
     return
   if (passwd)

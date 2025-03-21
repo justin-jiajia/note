@@ -12,7 +12,7 @@
     </el-form-item>
   </el-form>
 </template>
-<script setup>
+<script setup lang="ts">
 import AskPasswdComponent from './AskPasswdComponent.vue';
 import { ref, watch } from 'vue'
 import { MdEditor } from 'md-editor-v3';
@@ -30,7 +30,7 @@ const edit_form = ref({
   body: '',
 })
 
-const updShow = async (slug) => {
+const updShow = async (slug: string) => {
   await fetch_note(slug, false)
   await askpasswd.value.askPasswd()
   edit_form.value.title = cur_note.value.title

@@ -25,7 +25,7 @@
   </el-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { cur_note, verfiy_passwd, decrypt_note } from './utils/store';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';

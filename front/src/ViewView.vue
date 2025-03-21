@@ -75,7 +75,7 @@
   </el-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { Edit, Share, Delete, Refresh, DocumentCopy, Download, Clock } from '@element-plus/icons-vue';
 import { ref, watch } from 'vue';
 import { MdPreview, MdCatalog } from 'md-editor-v3';
