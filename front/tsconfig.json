@@ -1,0 +1,9 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "include": ["vite-env.d.ts", "**/*.ts", "**/*.vue"],
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "lib": ["es2023", "DOM"],
+    "types": ["vite/client"]
+  }
+}

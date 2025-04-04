@@ -1,18 +1,42 @@
 import { ref } from 'vue'
-import { encrypt, decrypt } from './crypto';
-import { format_date } from './date';
+import { encrypt, decrypt } from './crypto.js';
+import { format_date } from './date.js';
 
-export const cur_note = ref({
+interface Note {
+  title: string;
+  body: string;
+  created_at: number;
+  updated_at: number;
+  encryption_tag: string;
+  encryption_salt: string;
+  encryption_verification_tag: string;
+  decrypted: boolean;
+  is_encrypted: boolean;
+  slug: string;
+  passwd: string;
+  histories: Array<{
+    title: string;
+    body: string;
+    created_at: number;
+  }>;
+}
+
+const init_note: Note = {
   title: '',
   body: '',
   created_at: 0,
   updated_at: 0,
   encryption_tag: '',
   encryption_salt: '',
+  encryption_verification_tag: '',
+  decrypted: false,
   is_encrypted: false,
   slug: '----',
   passwd: '',
-})
+  histories: [],
+}
+
+export const cur_note = ref(init_note)
 
 export const fetch_note = async (slug: string, force: boolean) => {
   if (slug == cur_note.value.slug && !force) {
@@ -29,7 +53,7 @@ export const fetch_note = async (slug: string, force: boolean) => {
     ElMessage.error(resjson.error);
     return;
   }
-  cur_note.value = { ...cur_note.value, ...resjson }
+  cur_note.value = { ...cur_note.value, ...(resjson as Note) }
 }
 
 export const verfiy_passwd = (passwd: string) => {
@@ -61,17 +85,7 @@ export async function deletecurrent(router: any) {
     }
 
     ElMessage.success('Note deleted successfully');
-    cur_note.value = {
-      title: '',
-      body: '',
-      created_at: 0,
-      updated_at: 0,
-      encryption_tag: '',
-      encryption_salt: '',
-      is_encrypted: false,
-      slug: '----',
-      passwd: '',
-    }
+    cur_note.value = init_note
     router.push({ name: 'home' });
   } catch (error) { }
 }
@@ -129,7 +143,7 @@ export const updatecurrent = async (router: any, edited: any) => {
   const resjson = await res.json();
 
   ElMessage.success('Note updated successfully');
-  cur_note.value = { ...cur_note.value, ...resjson }
+  cur_note.value = { ...cur_note.value, ...(resjson as Note) }
   cur_note.value.decrypted = false
   router.push({ name: 'view', params: { slug: cur_note.value.slug } })
 }
@@ -147,7 +161,7 @@ export const create_note = async (note: any, router: any) => {
     ElMessage.error('Failed to create the note');
     return;
   }
-  cur_note.value = await res.json();
+  cur_note.value = await res.json() as Note;
   cur_note.value.passwd = ''
   router.push({ name: 'view', params: { 'slug': cur_note.value.slug } })
   return res;
