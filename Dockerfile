@@ -8,7 +8,7 @@ RUN yarn install && yarn build
 FROM golang:1.23 AS go-builder
 WORKDIR /app
 COPY . /app
-RUN go build . -o note
+RUN go build -o note .
 
 # Stage 3: Run the application
 FROM alpine:3.14
