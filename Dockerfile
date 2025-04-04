@@ -2,7 +2,7 @@
 FROM node:22 AS node-builder
 WORKDIR /app
 COPY ./front /app
-RUN npm install yarn -g && yarn install && yarn build
+RUN yarn install && yarn build
 
 # Stage 2: Build Go application
 FROM golang:1.23 AS go-builder
