@@ -34,32 +34,32 @@
           <el-button-group>
             <el-button
               :loading="refresh_loading"
-              :icon="Refresh"
+              :icon="RefreshIcon"
               @click="refresh()">
             </el-button>
             <el-button
-              :icon="Clock"
+              :icon="ClockIcon"
               @click="dialogHistoryVisible = !dialogHistoryVisible">
             </el-button>
             <el-button
-              :icon="Edit"
+              :icon="EditIcon"
               @click="$router.push({ name: 'edit', params: { slug: route.params.slug } })">
             </el-button>
             <el-button
-            :icon="Share"
+            :icon="ShareIcon"
             @click="sharecurruent()">
             </el-button>
             <el-button
               :loading="delete_loading"
-              :icon="Delete"
+              :icon="DeleteIcon"
               @click="_delete()">
             </el-button>
             <el-button
-              :icon="DocumentCopy"
+              :icon="DocumentCopyIcon"
               @click="copy_source()">
             </el-button>
             <el-button
-              :icon="Download"
+              :icon="DownloadIcon"
               @click="download_source()">
             </el-button>
           </el-button-group>
@@ -75,13 +75,13 @@
   </el-container>
 </template>
 
-<script setup>
-import { Edit, Share, Delete, Refresh, DocumentCopy, Download, Clock } from '@element-plus/icons-vue';
+<script setup lang="ts">
+import { Refresh as RefreshIcon, Edit as EditIcon, Share as ShareIcon, Delete as DeleteIcon, DocumentCopy as DocumentCopyIcon, Download as DownloadIcon, Clock as ClockIcon } from '@element-plus/icons-vue';
 import { ref, watch } from 'vue';
 import { MdPreview, MdCatalog } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
-import { cur_note, deletecurrent, sharecurruent, fetch_note, decrypt_note, copy_source, download_source } from './utils/store';
-import { format_date } from './utils/date';
+import { cur_note, deletecurrent, sharecurruent, fetch_note, decrypt_note, copy_source, download_source } from './utils/store.js';
+import { format_date } from './utils/date.js';
 import { useRoute, useRouter } from 'vue-router';
 import AskPasswdComponent from './AskPasswdComponent.vue';
 const id = 'preview-only';
@@ -90,14 +90,14 @@ const route = useRoute();
 const router = useRouter();
 const preview = ref(null);
 const previewVisible = ref(false);
-const askpasswd = ref(null);
+const askpasswd = ref<{ askPasswd: () => Promise<void> } | null>(null);
 const dialogHistoryVisible = ref(false);
 const refresh_loading = ref(false);
 const delete_loading = ref(false);
 
 async function refresh() {
   refresh_loading.value = true;
-  await fetch_note(route.params.slug, true)
+  await fetch_note(route.params.slug as string, true)
   decrypt_note()
   refresh_loading.value = false;
 }
@@ -108,10 +108,16 @@ async function _delete() {
   delete_loading.value = false;
 }
 
-async function viewNote(slug) {
+async function viewNote(slug: string) {
   await fetch_note(slug, false)
-  await askpasswd.value.askPasswd()
+  if (askpasswd?.value) {
+    await askpasswd.value.askPasswd();
+  }
 }
 
-watch(() => route.params.slug, viewNote, { immediate: true });
+watch(() => route.params.slug as string | undefined, (slug: string | undefined) => {
+  if (slug) {
+    viewNote(slug);
+  }
+}, { immediate: true });
 </script>

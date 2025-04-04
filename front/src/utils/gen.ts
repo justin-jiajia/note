@@ -1,5 +1,4 @@
-// Only a-z, 64bits
-export const generateSalt = () => {
+export const generateSalt = (): string => {
   const charset = 'abcdefghijklmnopqrstuvwxyz';
   let salt = '';
   for (let i = 0; i < 8; i++) {
@@ -7,8 +6,8 @@ export const generateSalt = () => {
   }
   return salt;
 }
-// Only a-z, A-Z, 0-9
-export const generatePasswd = () => {
+
+export const generatePasswd = (): string => {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let passwd = '';
   for (let i = 0; i < 16; i++) {

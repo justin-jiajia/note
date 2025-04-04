@@ -1,20 +1,44 @@
 import { ref } from 'vue'
-import { encrypt, decrypt } from './crypto';
-import { format_date } from './date';
+import { encrypt, decrypt } from './crypto.js';
+import { format_date } from './date.js';
 
-export const cur_note = ref({
+interface Note {
+  title: string;
+  body: string;
+  created_at: number;
+  updated_at: number;
+  encryption_tag: string;
+  encryption_salt: string;
+  encryption_verification_tag: string;
+  decrypted: boolean;
+  is_encrypted: boolean;
+  slug: string;
+  passwd: string;
+  histories: Array<{
+    title: string;
+    body: string;
+    created_at: number;
+  }>;
+}
+
+const init_note: Note = {
   title: '',
   body: '',
   created_at: 0,
   updated_at: 0,
   encryption_tag: '',
   encryption_salt: '',
+  encryption_verification_tag: '',
+  decrypted: false,
   is_encrypted: false,
   slug: '----',
   passwd: '',
-})
+  histories: [],
+}
 
-export const fetch_note = async (slug, force) => {
+export const cur_note = ref(init_note)
+
+export const fetch_note = async (slug: string, force: boolean) => {
   if (slug == cur_note.value.slug && !force) {
     return
   }
@@ -29,17 +53,17 @@ export const fetch_note = async (slug, force) => {
     ElMessage.error(resjson.error);
     return;
   }
-  cur_note.value = { ...cur_note.value, ...resjson }
+  cur_note.value = { ...cur_note.value, ...(resjson as Note) }
 }
 
-export const verfiy_passwd = (passwd) => {
+export const verfiy_passwd = (passwd: string) => {
   if (cur_note.value.encryption_tag != encrypt('tag', passwd, cur_note.value.encryption_salt)) {
     return false
   }
   return true
 };
 
-export async function deletecurrent(router) {
+export async function deletecurrent(router: any) {
   try {
     await ElMessageBox.confirm('This will delete the note, are you sure?', 'Warning', {
       confirmButtonText: 'OK',
@@ -61,17 +85,7 @@ export async function deletecurrent(router) {
     }
 
     ElMessage.success('Note deleted successfully');
-    cur_note.value = {
-      title: '',
-      body: '',
-      created_at: 0,
-      updated_at: 0,
-      encryption_tag: '',
-      encryption_salt: '',
-      is_encrypted: false,
-      slug: '----',
-      passwd: '',
-    }
+    cur_note.value = init_note
     router.push({ name: 'home' });
   } catch (error) { }
 }
@@ -104,7 +118,7 @@ export const sharecurruent = () => {
     })
 }
 
-export const updatecurrent = async (router, edited) => {
+export const updatecurrent = async (router: any, edited: any) => {
   var edited_encrypted = undefined
   if (cur_note.value.is_encrypted) {
     edited_encrypted = {
@@ -129,12 +143,12 @@ export const updatecurrent = async (router, edited) => {
   const resjson = await res.json();
 
   ElMessage.success('Note updated successfully');
-  cur_note.value = { ...cur_note.value, ...resjson }
+  cur_note.value = { ...cur_note.value, ...(resjson as Note) }
   cur_note.value.decrypted = false
   router.push({ name: 'view', params: { slug: cur_note.value.slug } })
 }
 
-export const create_note = async (note, router) => {
+export const create_note = async (note: any, router: any) => {
   const res = await fetch(import.meta.env.VITE_API_BASE + 'api/v1/notes', {
     method: 'POST',
     headers: {
@@ -147,13 +161,13 @@ export const create_note = async (note, router) => {
     ElMessage.error('Failed to create the note');
     return;
   }
-  cur_note.value = await res.json();
+  cur_note.value = await res.json() as Note;
   cur_note.value.passwd = ''
   router.push({ name: 'view', params: { 'slug': cur_note.value.slug } })
   return res;
 }
 
-export const decrypt_note = (passwd) => {
+export const decrypt_note = (passwd?: string) => {
   if (!cur_note.value.is_encrypted)
     return
   if (passwd)

@@ -17,11 +17,10 @@
     </el-form-item>
   </el-form>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { MdEditor } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
-import { config, XSSPlugin } from 'md-editor-v3';
 import { encrypt } from './utils/crypto';
 import { generatePasswd, generateSalt } from './utils/gen';
 import { useRouter } from 'vue-router';
@@ -37,10 +36,10 @@ const new_form = ref({
 async function createNote() {
   const { title, content, is_encrypted, password } = new_form.value;
   const salt = is_encrypted ? generateSalt() : null;
-  const encrypted_content = is_encrypted ? encrypt(content, password, salt) : content;
-  const encrypted_title = is_encrypted ? encrypt(title, password, salt) : title;
-  const encrypted_tag = is_encrypted ? encrypt('tag', password, salt) : null;
-  const encrypted_verification_tag = is_encrypted ? encrypt('verification', password, salt) : null;
+  const encrypted_content = is_encrypted ? encrypt(content ?? '', password, salt ?? '') : content;
+  const encrypted_title = is_encrypted ? encrypt(title ?? '', password, salt ?? '') : title;
+  const encrypted_tag = is_encrypted ? encrypt('tag', password, salt ?? '') : '';
+  const encrypted_verification_tag = is_encrypted ? encrypt('verification', password, salt ?? '') : '';
   
   await create_note({
     'title': encrypted_title,
@@ -56,15 +55,15 @@ async function createNote() {
 
 
 config({
-  markdownItPlugins(plugins) {
-    return [
+markdownItPlugins(plugins) {
+  return [
       ...plugins,
       {
         type: 'xss',
-        plugin: XSSPlugin,
+plugin: XSSPlugin,
         options: {},
       },
     ];
-  },
+},
 });
 </script>
