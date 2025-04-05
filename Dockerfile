@@ -7,7 +7,7 @@ RUN yarn install && yarn build
 # Stage 2: Build Go application
 FROM golang:1.23 AS go-builder
 WORKDIR /app
-COPY --from=node-builder /app /app  # Copy the whole file tree from Stage 1
+COPY --from=node-builder /app /app
 RUN go build -o note .
 
 # Stage 3: Run the application

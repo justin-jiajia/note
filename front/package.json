@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
-    "tsc": "vue-tsc --noEmit && tsc --noEmit"
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
@@ -25,12 +26,14 @@
     "@types/node": "22",
     "@types/pbkdf2": "^3.1.2",
     "@vitejs/plugin-vue": "^5.2.1",
-    "typescript": "^4.5.4",
+    "@vue/tsconfig": "^0.7.0",
+    "npm-run-all2": "^7.0.2",
+    "typescript": "~5.8.0",
     "unplugin-auto-import": "^19.0.0",
     "unplugin-vue-components": "^28.0.0",
     "vite": "^6.0.1",
     "vite-plugin-vue-devtools": "^7.6.5",
-    "vue-tsc": "^0.3.0"
+    "vue-tsc": "^2.2.8"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

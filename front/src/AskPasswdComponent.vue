@@ -36,17 +36,17 @@ const pa = ref({
   passwd: '',
   remember_passwd: true,
 });
-let resolvePassword = null; // Will hold the Promise resolver
+let resolvePassword: ((value: any) => void) | null = null; // Will hold the Promise resolver
 
 const rules = ref({
   passwd: [
     {
-      validator: (_, value, callback) => {
+      validator: (_: any, value: any, callback: any) => {
         if (verfiy_passwd(value)) {
           if (pa.value.remember_passwd)
             localStorage.setItem('passwd_' + route.params.slug, pa.value.passwd);
           decrypt_with_passwd();
-          if (resolvePassword) { resolvePassword(); resolvePassword = null; }
+          if (resolvePassword) { resolvePassword(null); resolvePassword = null; }
           callback();
         } else {
           callback(new Error("Wrong Password"));
@@ -79,7 +79,7 @@ async function askPasswd() {
       pa.value.passwd = '';
     }
   } else if (localStorage.getItem('passwd_' + route.params.slug)) {
-    pa.value.passwd = localStorage.getItem('passwd_' + route.params.slug);
+    pa.value.passwd = localStorage.getItem('passwd_' + route.params.slug) as string;
     if (!verfiy_passwd(pa.value.passwd)) {
       ElMessage.error('Wrong Password stored');
       localStorage.removeItem('passwd_' + route.params.slug);

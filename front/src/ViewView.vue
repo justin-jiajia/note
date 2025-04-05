@@ -88,7 +88,7 @@ const id = 'preview-only';
 const scrollElement = document.getElementById("preview-container");
 const route = useRoute();
 const router = useRouter();
-const preview = ref(null);
+const preview = ref("");
 const previewVisible = ref(false);
 const askpasswd = ref<{ askPasswd: () => Promise<void> } | null>(null);
 const dialogHistoryVisible = ref(false);

@@ -50,17 +50,4 @@ const upd = async () => {
 watch(() => route.params.slug as string | undefined, (slug: string | undefined) => {
   updShow(slug);
 }, { immediate: true });
-
-config({
-  markdownItPlugins(plugins) {
-    return [
-      ...plugins,
-      {
-        type: 'xss',
-        plugin: XSSPlugin,
-        options: {},
-      },
-    ];
-  },
-});
 </script>

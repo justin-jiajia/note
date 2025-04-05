@@ -40,7 +40,7 @@ async function createNote() {
   const encrypted_title = is_encrypted ? encrypt(title ?? '', password, salt ?? '') : title;
   const encrypted_tag = is_encrypted ? encrypt('tag', password, salt ?? '') : '';
   const encrypted_verification_tag = is_encrypted ? encrypt('verification', password, salt ?? '') : '';
-  
+
   await create_note({
     'title': encrypted_title,
     'body': encrypted_content,
@@ -49,21 +49,7 @@ async function createNote() {
     'encryption_salt': salt,
     'encryption_verification_tag': encrypted_verification_tag,
   }, router);
-  
+
   ElMessage.success('Note created successfully')
 }
-
-
-config({
-markdownItPlugins(plugins) {
-  return [
-      ...plugins,
-      {
-        type: 'xss',
-plugin: XSSPlugin,
-        options: {},
-      },
-    ];
-},
-});
 </script>
