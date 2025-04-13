@@ -8,7 +8,7 @@ RUN yarn install && yarn build
 FROM golang:1.23 AS go-builder
 WORKDIR /app
 COPY --from=node-builder /app /app
-RUN go build -o note .
+RUN CGO_ENABLED=0 go build -v -ldflags '-w -s' .
 
 # Stage 3: Run the application
 FROM alpine:3.14
